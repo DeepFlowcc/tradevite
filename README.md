@@ -1,5 +1,3 @@
-# Vue 3 + TypeScript + Vite
-
-This template should help get you started developing with Vue 3 and TypeScript in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
-
-Learn more about the recommended Project Setup and IDE Support in the [Vue Docs TypeScript Guide](https://vuejs.org/guide/typescript/overview.html#project-setup).
+# DeepFlow ai Hackathon
+通过DeepFlow的自动化合约部署、批量转账、批量归集、pancakeV3下lp管理、swap等的尝试，支持evm下的多链。
+程序利用小狐狸签名交易，安全性有保证。
