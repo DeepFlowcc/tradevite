@@ -135,7 +135,15 @@ const handleDeploy = async () => {
       return
     }
 
-    const erc20Bytecode = await fetch('/src/config/StandErc20_Byte.dat').then(res => res.text())
+    const erc20Bytecode = await fetch('/src/config/StandErc20_Byte.dat')
+      .then(res => res.text())
+      .then(text => {
+        // Remove all whitespace, newlines, and make sure it's a clean hex string
+        const cleaned = text.replace(/\s+/g, '').trim();
+        console.log('Original bytecode length:', text.length);
+        console.log('Cleaned bytecode length:', cleaned.length);
+        return cleaned;
+      });
     
     // 请求用户连接钱包
     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' })
@@ -148,11 +156,23 @@ const handleDeploy = async () => {
     const signer = provider.getSigner()
 
     // 准备合约构造函数参数
+    const totalSupplyBigNumber = ethers.utils.parseUnits(
+      erc20Form.value.totalSupply.toString(), 
+      erc20Form.value.decimals
+    );
+    
+    // Create constructor args as an array to prevent any spreading issues
     const constructorArgs = [
       erc20Form.value.name,
       erc20Form.value.symbol,
-      ethers.utils.parseUnits(erc20Form.value.totalSupply.toString(), erc20Form.value.decimals)
-    ]
+      totalSupplyBigNumber
+    ];
+    
+    console.log('Constructor arguments:', {
+      name: erc20Form.value.name,
+      symbol: erc20Form.value.symbol,
+      totalSupply: totalSupplyBigNumber.toString()
+    });
 
     // 创建合约工厂
     const factory = new ethers.ContractFactory(
@@ -163,7 +183,12 @@ const handleDeploy = async () => {
 
     // 部署合约
     ElMessage.info('正在部署合约，请在钱包中确认交易...')
-    const contract = await factory.deploy(...constructorArgs)
+    // Deploy with explicit argument passing to prevent spreading issues in WebContainer
+    const contract = await factory.deploy(
+      constructorArgs[0],
+      constructorArgs[1],
+      constructorArgs[2]
+    );
     
     // 等待合约部署完成
     await contract.deployed()
